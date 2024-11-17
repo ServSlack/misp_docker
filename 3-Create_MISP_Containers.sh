@@ -43,10 +43,15 @@ docker cp web/files/modsecurity/modsec_rotate misp_web:/etc/logrotate.d/modsec
 #
 #
 # MariaDB Tunning for " misp_db ":
-export num_cpu=$(cat /proc/cpuinfo | grep processor | wc -l | awk '{print int($1 * 0.90)}')
+# Calcula 50% do número de processadores encontrados.
+export num_cpu=$(cat /proc/cpuinfo | grep processor | wc -l | awk '{print int($1 * 0.50)}')
+# Define a variável de ambiente innodb_buffer_pool_instances com o valor de num_cpu, ou seja, o número de instâncias do pool de buffer InnoDB será igual ao número de CPUs calculado anteriormente.
 export innodb_buffer_pool_instances=$num_cpu
+# Calcula 70% desse valor e converte para um inteiro.
 export ram_70=$(free -h | grep Mem | awk '{print $2}' | tr -d "Gi" | awk '{print int($1 * 0.7)}')
+# Define a variável de ambiente innodb_buffer_pool_size com o valor de ram_70, ou seja, o tamanho do pool de buffer InnoDB será de 70% da memória total disponível.
 export innodb_buffer_pool_size=$ram_70
+# Define a variável de ambiente max_connections com o valor de num_cpu multiplicado por 10. Isso define o número máximo de conexões permitidas, baseado no número de CPUs.
 export max_connections=$((num_cpu * 10))
 #
 # Create MariaDB Tunned file:
