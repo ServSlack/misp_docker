@@ -56,15 +56,17 @@ $ 2-) Once you have Docker installed propertly RUN: " 2_Build_MISP_Image.sh "
 $ 3-) After complete BUILD Image RUN: " 3_Create_MISP_Containers.sh " to create MISP Containers.
 
 $ 4-) When image below apears you can access your instance directly using your IP as example: " https://192.168.1.5 "
-# ATTENTION !!!! ---> Will be generated a file asked " password.txt " and I recommend you save this information in some Key Vault and after REMOVE the file.
+$ ATTENTION !!!! ---> Will be generated a file asked " password.txt " and I recommend you save this information in some Key Vault and after REMOVE the file.
 
 # Building your image
 
 ## Fetch files
 ```
-$ git clone [https://github.com/MISP/misp-docker](https://github.com/ServSlack/misp_docker_ubuntu_24_04)
+$ git clone https://github.com/ServSlack/misp_docker_ubuntu_24_04
 $ cd misp_docker_ubuntu_24_04
-$ 
+$ chmod +x *.sh
+$ chmod +x web/*.sh
+$ chmod +x files/*.sh
 ```
 
 ## Install Docker
