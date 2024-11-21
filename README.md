@@ -73,12 +73,11 @@ $ chmod +x files/*.sh
 ```
 $ ./1_Install_Docker.sh
 
-## Build the containers
+## Build MISP Images
 ```
 $ ./2-Build_MISP_Image.sh
-```
 
 ## Run containers
 ```
 $ ./3-Create_MISP_Containers.sh
-``
+```
