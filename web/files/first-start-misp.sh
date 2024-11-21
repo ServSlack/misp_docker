@@ -2,6 +2,7 @@
 echo " FIRT START MISP_WEB "
 #
 # ZeroMQ settings:
+sleep 5
 sudo -Hu www-data /var/www/MISP/app/Console/cake Admin setSetting "Plugin.ZeroMQ_enable" true
 sudo -Hu www-data /var/www/MISP/app/Console/cake Admin setSetting "Plugin.ZeroMQ_host" "127.0.0.1"
 sudo -Hu www-data /var/www/MISP/app/Console/cake Admin setSetting "Plugin.ZeroMQ_port" 50000

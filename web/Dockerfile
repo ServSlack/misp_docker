@@ -3,19 +3,18 @@ FROM ubuntu:24.04
 # Install MISP CORE components
 USER root
 # Atualizar e instalar pacotes necessários
-ADD files/ubuntu.sources /etc/apt/sources.list.d/ubuntu.sources
-ADD files/sources.list /etc/apt/sources.list
 RUN apt-get update -y && \
     apt-get dist-upgrade -qy && apt-get upgrade && apt-get autoremove -y && apt-get clean && \
     apt-get install -qy software-properties-common && \
     apt-get install -qy postfix rsyslog systemd systemd-sysv && \
-    apt-get install -qy mysql-client curl gcc git gnupg-agent \
+    apt-get install -qy mysql-client curl gcc git gnupg-agent bash \
     make cmake openssl redis-server sudo vim zip locales wget iproute2 supervisor cron libfuzzy-dev librdkafka-dev \
     libffi-dev libbrotli1 librdkafka1 libfuzzy2 libsimdjson-dev ssdeep clamav clamav-daemon python3 python3-pip \
-    python3-virtualenv python3.12-venv apache2 binutils libbrotli-dev libzstd-dev net-tools ntpsec iputils-ping python3-xyzservices tzdata
+    python3-virtualenv python3.12-venv apache2 binutils libbrotli-dev libzstd-dev net-tools ntpsec iputils-ping \
+    python3-xyzservices tzdata
 #
 #
-ADD template.env /tmp/misp/.env
+ADD template.env /tmp/.env
 RUN export $(cat /tmp/.env | grep -v '#' | awk '/=/ {print $1}')
 #
 # Criar o usuário misp e definir a senha misp
@@ -33,15 +32,8 @@ ADD files/ntp.conf /etc/ntpsec/
 ADD run.sh /run.sh 
 RUN sudo chmod +x /run.sh 
 #
-ADD wait-for-it.sh /usr/local/bin/wait-for-it.sh
-RUN sudo chmod +x /usr/local/bin/wait-for-it.sh
-RUN ln -s /usr/local/bin/wait-for-it.sh /wait-for-it.sh
-#
 ADD files/first-start-misp.sh /tmp/ 
 RUN sudo chmod +x /tmp/first-start-misp.sh
-#
-#ADD files/misp-modules.sh /tmp/
-#RUN sudo chmod +x /tmp/misp-modules.sh
 #
 ADD files/misp.cron.d /etc/cron.d/misp
 ADD files/entrypoint_cron.sh /
@@ -69,13 +61,12 @@ ENV PATH="/opt/venv/bin:$PATH"
 #
 RUN pip install --upgrade pip
 #
-# Configure Systemd
-RUN apt-get install -y systemd
-RUN mkdir -p /run/systemd /tmp/systemd
+RUN pip3 list -o | awk 'NR>2 {print $1}' | xargs -r -n1 pip3 install -U ; exit 0
 #
 # Add run script
 COPY --chown=root:root run.sh /run.sh
 COPY --chown=root:root wait-for-it.sh /usr/local/bin/wait-for-it.sh
+RUN ln -s /usr/local/bin/wait-for-it.sh /wait-for-it.sh
 RUN chmod 0755 /run.sh && touch /.firstboot.tmp
 #
 # Make a backup of /var/www/MISP to restore it to the local moint point at first boot

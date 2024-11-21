@@ -22,36 +22,36 @@ echo "MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD" | tee -a password.txt | tee -a .
 MISP_USER_PASSWORD="$(openssl rand -hex 32)"
 echo "MISP_USER_PASSWORD=$MISP_USER_PASSWORD" | tee -a password.txt | tee -a .env
 
-timeout -s 9 160s docker compose up
+# Execute docker-compose up em segundo plano
+docker-compose up -d
+
+# Função para monitorar logs e reiniciar o contêiner
+monitor_logs_and_restart() {
+#	docker cp web/files/supervisord.conf misp_web:/etc/supervisor/conf.d/supervisord.conf
+#	docker cp web/files/misp-workers.conf misp_web:/etc/supervisor/conf.d/misp-workers.conf
+    	docker logs -f misp_web 2>&1 | while read line; do
+        echo "$line" | grep -q "INFO supervisord started with pid 1"
+        if [ $? -eq 0 ]; then
+            echo "Restarting container misp_web..."
+            docker restart misp_web
+        fi
+    done
+}
+
+# Iniciar a função de monitoramento
+monitor_logs_and_restart
 
 # MISP_WEB:
-#docker cp web/files/wait-for-it.sh /usr/local/bin/wait-for-it.sh
-#docker exec misp_web chmod +x /usr/local/bin/wait-for-it.sh
-#docker exec misp_web ln -s /usr/local/bin/wait-for-it.sh /wait-for-it.sh
-docker cp web/files/supervisord.conf misp_web:/etc/supervisor/conf.d/supervisord.conf
-docker exec misp_web chown misp:misp /etc/supervisor/conf.d/supervisord.conf
 docker cp web/files/first-start-misp.sh misp_web:/tmp/
 docker exec misp_web chmod +x /tmp/first-start-misp.sh 
 docker exec misp_web chown misp:misp /tmp/first-start-misp.sh 
 docker exec misp_web bash /tmp/first-start-misp.sh
 #
-# Enable Apache ModSecurity3:
-docker exec -it misp_web bash -c 'apt update && apt install -qy libapache2-mod-security2 libmodsecurity3 modsecurity-crs' 
-docker cp web/files/modsecurity/security2.conf misp_web:/etc/apache2/mods-enabled/security2.conf
-docker cp web/files/modsecurity/modsecurity.conf misp_web:/etc/modsecurity/modsecurity.conf
-docker cp web/files/modsecurity/modsec_rotate misp_web:/etc/logrotate.d/modsec
-#
-#
 # MariaDB Tunning for " misp_db ":
-# Calcula 50% do número de processadores encontrados.
-export num_cpu=$(cat /proc/cpuinfo | grep processor | wc -l | awk '{print int($1 * 0.50)}')
-# Define a variável de ambiente innodb_buffer_pool_instances com o valor de num_cpu, ou seja, o número de instâncias do pool de buffer InnoDB será igual ao número de CPUs calculado anteriormente.
+export num_cpu=$(cat /proc/cpuinfo | grep processor | wc -l | awk '{print int($1 * 0.90)}')
 export innodb_buffer_pool_instances=$num_cpu
-# Calcula 70% desse valor e converte para um inteiro.
 export ram_70=$(free -h | grep Mem | awk '{print $2}' | tr -d "Gi" | awk '{print int($1 * 0.7)}')
-# Define a variável de ambiente innodb_buffer_pool_size com o valor de ram_70, ou seja, o tamanho do pool de buffer InnoDB será de 70% da memória total disponível.
 export innodb_buffer_pool_size=$ram_70
-# Define a variável de ambiente max_connections com o valor de num_cpu multiplicado por 10. Isso define o número máximo de conexões permitidas, baseado no número de CPUs.
 export max_connections=$((num_cpu * 10))
 #
 # Create MariaDB Tunned file:
