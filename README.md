@@ -1,6 +1,6 @@
 MISP Docker Ubuntu 24.04
 
-Project created by Weliton Souza, please give the credits and lets connect " https://www.linkedin.com/in/weliton-souza/ "
+Project created by Weliton Souza, lets connect " https://www.linkedin.com/in/weliton-souza/ ".
 
 This project can be used to create two Docker containers running Ubuntu 24.04 with MISP ("Malware Information Sharing Platform").
 
