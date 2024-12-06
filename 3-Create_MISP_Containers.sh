@@ -47,7 +47,12 @@ docker exec misp_web chmod +x /tmp/first-start-misp.sh
 docker exec misp_web chown misp:misp /tmp/first-start-misp.sh 
 docker exec misp_web bash /tmp/first-start-misp.sh
 #
+docker cp web/files/stix2.sh misp_web:/tmp/
+docker exec misp_web chmod +x /tmp/stix2.sh
+docker exec misp_web bash /tmp/stix2.sh
+#
 # MariaDB Tunning for " misp_db ":
+docker cp misp_db:/etc/mysql/mariadb.cnf db/mariadb.cnf-bkp-misp_web
 export num_cpu=$(cat /proc/cpuinfo | grep processor | wc -l | awk '{print int($1 * 0.90)}')
 export innodb_buffer_pool_instances=$num_cpu
 export ram_70=$(free -h | grep Mem | awk '{print $2}' | tr -d "Gi" | awk '{print int($1 * 0.7)}')
@@ -55,8 +60,7 @@ export innodb_buffer_pool_size=$ram_70
 export max_connections=$((num_cpu * 10))
 #
 # Create MariaDB Tunned file:
-rm db/files/my.cnf
-cat <<EOF > db/files/my.cnf
+cat <<EOF > db/mariadb.cnf
 [mariadbd]
 performance_schema=ON
 performance-schema-instrument='stage/%=ON'
@@ -132,8 +136,7 @@ slow_query_log_file=/var/log/mysql/slow.log
 EOF
 #
 docker exec -it misp_db bash -c 'apt update && apt upgrade -qy && apt install vim mysql-client pv -qy'
-docker cp db/files/my.cnf misp_db:/etc/mysql/my.cnf
-rm db/files/my.cnf
+docker cp db/mariadb.cnf misp_db:/etc/mysql/mariadb.cnf
 #
 docker container restart misp_db misp_web
 #
@@ -180,6 +183,9 @@ save_settings() {
     # Salvar as configurações no arquivo misp_settings.txt
     echo "$settings" | tee /var/log/misp_settings.txt
 }
+
+# Remove "template_build.env"
+rm .env
 
 # Chamar a função save_settings para salvar e exibir as configurações
 save_settings

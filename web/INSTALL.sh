@@ -43,7 +43,7 @@ SUPERVISOR_PASSWORD="$(random_string)"
 
 ### PHP settings
 upload_max_filesize="50M"
-post_max_size="50M"
+post_max_size="10M"
 max_execution_time="300"
 memory_limit="4096M"
 
