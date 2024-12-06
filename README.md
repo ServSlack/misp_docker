@@ -1,6 +1,6 @@
 MISP Docker Ubuntu 24.04
 
-Project created by Weliton Souza, lets connect " https://www.linkedin.com/in/weliton-souza/ ".
+Project created by Weliton Souza, lets connect " https://www.linkedin.com/in/weliton-souza/ "
 
 This project can be used to create two Docker containers running Ubuntu 24.04 with MISP ("Malware Information Sharing Platform").
 
@@ -63,7 +63,7 @@ $ ATTENTION !!!! ---> Will be generated a file asked " password.txt " and I reco
 ## Fetch files
 ```
 $ git clone https://github.com/ServSlack/misp_docker
-$ cd misp_docker
+$ cd misp_docker_ubuntu_24_04
 $ chmod +x *.sh
 $ chmod +x web/*.sh
 $ chmod +x files/*.sh
